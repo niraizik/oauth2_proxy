@@ -783,7 +783,7 @@ func (p *OAuthProxy) OAuthCallback(rw http.ResponseWriter, req *http.Request) {
 func (p *OAuthProxy) AuthenticateOnly(rw http.ResponseWriter, req *http.Request) {
 	session, err := p.getAuthenticatedSession(rw, req)
 	if err != nil {
-		http.Error(rw, "unauthorized request", http.StatusUnauthorized)
+		rw.WriteHeader(http.StatusAccepted)
 		return
 	}
 
