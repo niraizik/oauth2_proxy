@@ -782,8 +782,11 @@ func (p *OAuthProxy) OAuthCallback(rw http.ResponseWriter, req *http.Request) {
 // AuthenticateOnly checks whether the user is currently logged in
 func (p *OAuthProxy) AuthenticateOnly(rw http.ResponseWriter, req *http.Request) {
 	session, err := p.getAuthenticatedSession(rw, req)
-	if err != nil {
+	if err == http.ErrNoCookie {
 		rw.WriteHeader(http.StatusAccepted)
+		return
+	} else if err != nil {
+		http.Error(rw, "unauthorized request", http.StatusUnauthorized)
 		return
 	}
 
@@ -848,6 +851,9 @@ func (p *OAuthProxy) getAuthenticatedSession(rw http.ResponseWriter, req *http.R
 		session, err = p.LoadCookiedSession(req)
 		if err != nil {
 			logger.Printf("Error loading cookied session: %s", err)
+		}
+		if err == http.ErrNoCookie {
+			return nil, err
 		}
 
 		if session != nil {

@@ -51,7 +51,7 @@ func (s *SessionStore) Load(req *http.Request) (*sessions.SessionState, error) {
 	c, err := loadCookie(req, s.CookieOptions.CookieName)
 	if err != nil {
 		// always http.ErrNoCookie
-		return nil, fmt.Errorf("Cookie %q not present", s.CookieOptions.CookieName)
+		return nil, http.ErrNoCookie
 	}
 	val, _, ok := encryption.Validate(c, s.CookieOptions.CookieSecret, s.CookieOptions.CookieExpire)
 	if !ok {
