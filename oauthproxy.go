@@ -843,8 +843,10 @@ func (p *OAuthProxy) OAuthCallback(rw http.ResponseWriter, req *http.Request) {
 
 // AuthenticateOnly checks whether the user is currently logged in
 func (p *OAuthProxy) AuthenticateOnly(rw http.ResponseWriter, req *http.Request) {
+	isPreflightRequestAllowed := p.skipAuthPreflight && req.Header.Get("X-Original-Method") == "OPTIONS"
+
 	session, err := p.getAuthenticatedSession(rw, req)
-	if err != nil {
+	if err != nil && isPreflightRequestAllowed == false {
 		http.Error(rw, "unauthorized request", http.StatusUnauthorized)
 		return
 	}
